@@ -11,20 +11,46 @@
   ],
   "activationEvents": [
     "onCommand:python-reader.readPython",
-    "onCommand:python-reader.readCurrentLine"
+    "onCommand:python-reader.readCurrentLine",
+    "onCommand:python-reader.readSymbol"
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "python-reader.readPython",
-        "title": "Python Reader: Read File or Selection"
-      },
-      {
-        "command": "python-reader.readCurrentLine",
-        "title": "Python Reader: Read Current Line"
-      }
-    ]
+   "commands": [
+  {
+    "command": "python-reader.readPython",
+    "title": "Python Reader: Read File or Selection"
+  },
+  {
+    "command": "python-reader.readCurrentLine",
+    "title": "Python Reader: Read Current Line"
+  },
+  {
+    "command": "python-reader.readSymbol",
+    "title": "Python Reader: Read Current Symbol"
+  },
+  {
+    "command": "python-reader.readNextLine",
+    "title": "Python Reader: Read Next Line"
+  },
+  {
+    "command": "python-reader.spellCurrentLine",
+    "title": "Python Reader: Spell Out Current Line"
+  }
+],
+"keybindings": [
+  {
+    "command": "python-reader.readNextLine",
+    "key": "cmd+alt+down",
+    "when": "editorTextFocus && editorLangId == python"
+  },
+  {
+    "command": "python-reader.spellCurrentLine",
+    "key": "cmd+alt+s",
+    "when": "editorTextFocus && editorLangId == python"
+  }
+]
+
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
