@@ -4,18 +4,25 @@
   "description": "A python screen reader developed by computer science undergraduates at Texas A&M.",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.99.0"
+    "vscode": ">=1.95.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:python-reader.readPython",
+    "onCommand:python-reader.readCurrentLine"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "python-reader.helloWorld",
-        "title": "Hello World"
+        "command": "python-reader.readPython",
+        "title": "Python Reader: Read File or Selection"
+      },
+      {
+        "command": "python-reader.readCurrentLine",
+        "title": "Python Reader: Read Current Line"
       }
     ]
   },
@@ -28,14 +35,17 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.99.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.99.0",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
-    "eslint": "^9.23.0",
-    "typescript": "^5.8.2",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.23.0",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "say": "^0.16.0"
   }
 }

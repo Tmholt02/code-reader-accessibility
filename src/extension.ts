@@ -1,26 +1,70 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+const say = require('say');
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+
 export function activate(context: vscode.ExtensionContext) {
+	console.log('Python Reader extension is now active!');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "python-reader" is now active!');
+	// Read selected text or entire Python file
+	const readPythonCommand = vscode.commands.registerCommand('python-reader.readPython', () => {
+		const editor = vscode.window.activeTextEditor;
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('python-reader.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Python Reader!');
+		if (!editor) {
+			vscode.window.showInformationMessage('No active editor found.');
+			return;
+		}
+
+		const doc = editor.document;
+
+		if (doc.languageId !== 'python') {
+			vscode.window.showInformationMessage('This extension only works with Python files.');
+			return;
+		}
+
+		let textToRead = editor.document.getText(editor.selection);
+		if (!textToRead || textToRead.trim() === '') {
+			textToRead = editor.document.getText();
+		}
+
+		if (textToRead.trim() === '') {
+			vscode.window.showInformationMessage('There is no text to read.');
+			return;
+		}
+
+		vscode.window.showInformationMessage('Reading Python code...');
+		say.speak(textToRead);
 	});
 
-	context.subscriptions.push(disposable);
+	// Read the current line aloud
+	const readCurrentLineCommand = vscode.commands.registerCommand('python-reader.readCurrentLine', () => {
+		const editor = vscode.window.activeTextEditor;
+
+		if (!editor) {
+			vscode.window.showInformationMessage('No active editor found.');
+			return;
+		}
+
+		const doc = editor.document;
+
+		if (doc.languageId !== 'python') {
+			vscode.window.showInformationMessage('This extension only works with Python files.');
+			return;
+		}
+
+		const currentLine = editor.document.lineAt(editor.selection.active.line).text;
+
+		if (!currentLine.trim()) {
+			vscode.window.showInformationMessage('Current line is empty.');
+			return;
+		}
+
+		vscode.window.showInformationMessage('Reading current line...');
+		say.speak(currentLine);
+	});
+
+	context.subscriptions.push(readPythonCommand, readCurrentLineCommand);
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+	say.stop();
+}
