@@ -1,6 +1,13 @@
 import * as vscode from 'vscode';
 const say = require('say');
 
+export function speakWithSpeed(text: string) {
+	const speed = vscode.workspace.getConfiguration().get<number>('python-reader.voiceSpeed', 1.0);
+	console.log('Voice speed setting:', speed);
+
+	say.speak(text, undefined, speed);
+
+}
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Python Reader extension is now active!');
@@ -32,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		vscode.window.showInformationMessage('Reading Python code...');
-		say.speak(textToRead);
+		speakWithSpeed(textToRead);
 	});
 
 	// Read the current line aloud
@@ -59,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		vscode.window.showInformationMessage('Reading current line...');
-		say.speak(currentLine);
+		speakWithSpeed(currentLine);
 	});
 
 	// new comand
@@ -83,7 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 		// Check for function or class definition
 		if (currentLine.startsWith('def ') || currentLine.startsWith('class ')) {
-			say.speak(`You are on ${currentLine}`);
+			speakWithSpeed(`You are on ${currentLine}`);
 			return;
 		}
 	
@@ -101,12 +108,12 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	
 		if (foundStart) {
-			say.speak(`Docstring says: ${docstring}`);
+			speakWithSpeed(`Docstring says: ${docstring}`);
 			return;
 		}
 	
 		// Fallback to current line
-		say.speak(currentLine || 'No symbol found on this line.');
+		speakWithSpeed(currentLine || 'No symbol found on this line.');
 	});
 
 	const readNextLineCommand = vscode.commands.registerCommand('python-reader.readNextLine', async () => {
@@ -121,9 +128,9 @@ export function activate(context: vscode.ExtensionContext) {
 			editor.selection = new vscode.Selection(newPos, newPos);
 			editor.revealRange(new vscode.Range(newPos, newPos));
 			const nextLine = editor.document.lineAt(currentLine + 1).text.trim();
-			say.speak(nextLine || 'Blank line');
+			speakWithSpeed(nextLine || 'Blank line');
 		} else {
-			say.speak('End of file');
+			speakWithSpeed('End of file');
 		}
 	});
 	
@@ -131,23 +138,80 @@ export function activate(context: vscode.ExtensionContext) {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor || editor.document.languageId !== 'python') return;
 	
-		const line = editor.document.lineAt(editor.selection.active.line).text;
-		if (!line.trim()) {
-			say.speak('Blank line');
+		const doc = editor.document;
+		const lineNumber = editor.selection.active.line;
+		const lineText = doc.lineAt(lineNumber).text.trim();
+	
+		if (!lineText) {
+			speakWithSpeed('Blank line');
 			return;
 		}
 	
-		// Find comment split
-		const hashIndex = line.indexOf('#');
-		let codePart = line;
+		if (lineText.startsWith('#')) {
+			const comment = lineText.replace(/^#\s?/, '');
+			speakWithSpeed(`Comment: ${comment}`);
+			return;
+		}
+	
+		const insideDocstring = () => {
+			let isInDocstring = false;
+			let docstringType = null;
+	
+			for (let i = 0; i <= lineNumber; i++) {
+				const text = doc.lineAt(i).text.trim();
+				if (text.includes(`'''`) || text.includes(`"""`)) {
+					const triple = text.includes(`'''`) ? `'''` : `"""`;
+					if (!docstringType) {
+						docstringType = triple;
+						isInDocstring = true;
+					} else if (triple === docstringType) {
+						isInDocstring = false;
+						docstringType = null;
+					}
+				}
+			}
+			return isInDocstring;
+		};
+	
+		if (insideDocstring()) {
+			let docstringLines: string[] = [];
+			let started = false;
+			let docstringType = null;
+	
+			for (let i = 0; i < doc.lineCount; i++) {
+				const text = doc.lineAt(i).text.trim();
+	
+				if ((text.includes(`'''`) || text.includes(`"""`))) {
+					const triple = text.includes(`'''`) ? `'''` : `"""`;
+					if (!started) {
+						started = true;
+						docstringType = triple;
+						docstringLines.push(text.replace(triple, '').trim());
+					} else if (triple === docstringType) {
+						docstringLines.push(text.replace(triple, '').trim());
+						break;
+					} else {
+						docstringLines.push(text);
+					}
+				} else if (started) {
+					docstringLines.push(text);
+				}
+			}
+	
+			const docstring = docstringLines.join(' ').trim();
+			speakWithSpeed(`Docstring: ${docstring}`);
+			return;
+		}
+	
+		const hashIndex = lineText.indexOf('#');
+		let codePart = lineText;
 		let commentPart = '';
 	
 		if (hashIndex !== -1) {
-			codePart = line.slice(0, hashIndex);
-			commentPart = line.slice(hashIndex + 1).trim();
+			codePart = lineText.slice(0, hashIndex);
+			commentPart = lineText.slice(hashIndex + 1).trim();
 		}
 	
-		// Function to spell code (same as before)
 		const spell = (text: string) =>
 			text.split('').map(char => {
 				switch (char) {
@@ -178,17 +242,49 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			}).join(', ');
 	
-		// Speak parts
 		let toSpeak = spell(codePart);
-	
 		if (commentPart) {
 			toSpeak += `. Start of comment: ${commentPart}`;
 		}
 	
-		say.speak(toSpeak);
+		speakWithSpeed(toSpeak);
 	});
 	
 	
+	const openSettingsPanelCommand = vscode.commands.registerCommand('python-reader.openSettingsPanel', () => {
+		const panel = vscode.window.createWebviewPanel(
+			'pythonReaderSettings',
+			'Python Reader Settings',
+			vscode.ViewColumn.One,
+			{
+				enableScripts: true
+			}
+		);
+	
+		// HTML content for the panel
+		panel.webview.html = getWebviewContent();
+	
+		// Handle messages from the webview
+		panel.webview.onDidReceiveMessage(
+			message => {
+				switch (message.command) {
+					case 'setVoiceSpeed':
+						vscode.workspace.getConfiguration().update('python-reader.voiceSpeed', message.value, true);
+						break;
+					case 'setFontFamily':
+						vscode.workspace.getConfiguration().update('editor.fontFamily', message.value, true);
+						break;
+					case 'setColorTheme':
+						vscode.workspace.getConfiguration().update('workbench.colorTheme', message.value, true);
+						break;
+				}
+			},
+			undefined,
+			context.subscriptions
+		);
+	});
+	
+	context.subscriptions.push(openSettingsPanelCommand);
 	
 	
 
@@ -200,6 +296,67 @@ export function activate(context: vscode.ExtensionContext) {
 		spellCurrentLineCommand
 	);
 }
+
+export function getWebviewContent(): string {
+	return `
+		<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<title>Python Reader Settings</title>
+			<style>
+				body {
+					font-family: sans-serif;
+					padding: 1rem;
+				}
+				label {
+					font-weight: bold;
+					display: block;
+					margin-top: 1rem;
+				}
+				select, input {
+					width: 100%;
+					padding: 0.4rem;
+					font-size: 1rem;
+				}
+			</style>
+		</head>
+		<body>
+			<h2>🛠️ Python Reader Settings</h2>
+
+			<label for="speed">Voice Speed</label>
+			<select id="speed">
+				<option value="0.6">Slow</option>
+				<option value="1.0" selected>Normal</option>
+				<option value="1.4">Fast</option>
+			</select>
+
+			<label for="font">Font Family</label>
+			<input id="font" type="text" placeholder="e.g., Fira Code, Courier New" />
+
+			<label for="theme">VS Code Theme</label>
+			<input id="theme" type="text" placeholder="e.g., Default Dark+, Solarized Light" />
+
+			<script>
+				const vscode = acquireVsCodeApi();
+
+				document.getElementById('speed').addEventListener('change', (e) => {
+					vscode.postMessage({ command: 'setVoiceSpeed', value: parseFloat(e.target.value) });
+				});
+
+				document.getElementById('font').addEventListener('change', (e) => {
+					vscode.postMessage({ command: 'setFontFamily', value: e.target.value });
+				});
+
+				document.getElementById('theme').addEventListener('change', (e) => {
+					vscode.postMessage({ command: 'setColorTheme', value: e.target.value });
+				});
+			</script>
+		</body>
+		</html>
+	`;
+}
+
 
 export function deactivate() {
 	say.stop();

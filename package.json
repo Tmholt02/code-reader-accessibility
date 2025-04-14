@@ -12,7 +12,9 @@
   "activationEvents": [
     "onCommand:python-reader.readPython",
     "onCommand:python-reader.readCurrentLine",
-    "onCommand:python-reader.readSymbol"
+    "onCommand:python-reader.readSymbol",
+    "onCommand:python-reader.openSettingsPanel"
+
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -36,8 +38,35 @@
   {
     "command": "python-reader.spellCurrentLine",
     "title": "Python Reader: Spell Out Current Line"
+  },
+  {
+    "command": "python-reader.openSettingsPanel",
+    "title": "Python Reader: Open Settings Panel"
   }
+  
 ],
+"configuration": {
+  "type": "object",
+  "title": "Python Reader Settings",
+  "properties": {
+    "python-reader.voiceSpeed": {
+      "type": "number",
+      "default": 1.0,
+      "description": "Controls the speed of the Python screen reader voice."
+    },
+    "python-reader.fontFamily": {
+      "type": "string",
+      "default": "",
+      "description": "Font family for the editor, e.g., Fira Code, Courier New."
+    },
+    "python-reader.theme": {
+      "type": "string",
+      "default": "",
+      "description": "Color theme to apply in VS Code."
+    }
+  }
+}
+,
 "keybindings": [
   {
     "command": "python-reader.readNextLine",
