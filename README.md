@@ -20,9 +20,11 @@ Need vscode version >1.95.
 
 1. cmd + shift + P for command mode (Mac)
 ctrl + shift + P for command mode (Windows)
-- Type "python-reader.readPython",
-- Type "python-reader.readCurrentLine",
-- Type "python-reader.readSymbol"
+- Type "Python Reader: Read Current Line",
+- Type "Python Reader: Read File or Selection",
+- Type "Python Reader: Read Current Symbol"
+- Type "Python Reader: Read Next Line"
+- Type "Python Reader: Open Settings Panel"
 
 2. cmd + option + down-arrowkey (Mac)
 ctrl + alt + down-arrowkey (Windows)
