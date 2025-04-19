@@ -14,7 +14,25 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Need vscode version >1.95.
+
+## Commands
+
+1. cmd + shift + P for command mode (Mac)
+ctrl + shift + P for command mode (Windows)
+- Type "Python Reader: Read Current Line",
+- Type "Python Reader: Read File or Selection",
+- Type "Python Reader: Read Current Symbol"
+- Type "Python Reader: Read Next Line"
+- Type "Python Reader: Open Settings Panel"
+
+2. cmd + option + down-arrowkey (Mac)
+ctrl + alt + down-arrowkey (Windows)
+    to read next line
+
+3. cmd + option + s (Mac)
+ctrl + alt + s (Windows)
+    to read each character and comments on a single line
 
 ## Extension Settings
 
