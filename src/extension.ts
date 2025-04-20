@@ -1,8 +1,15 @@
 import * as vscode from 'vscode';
 const say = require('say');
 
+const getVoiceSpeed = () => vscode.workspace.getConfiguration().get<number>('python-reader.voiceSpeed', 1.0);
+const getSelectedFont = () => vscode.workspace.getConfiguration().get<string>('editor.fontFamily', 'Fira Code');
+const getVsCodeTheme = () => vscode.workspace.getConfiguration().get<string>('workbench.colorTheme', 'Default Dark+');
+const setVoiceSpeed = (speed: number) => vscode.workspace.getConfiguration().update('python-reader.voiceSpeed', speed, true);
+const setSelectedFont = (font: string) => vscode.workspace.getConfiguration().update('editor.fontFamily', font, true);
+const setVsCodeTheme = (theme: string) => vscode.workspace.getConfiguration().update('workbench.colorTheme', theme, true);
+
 export function speakWithSpeed(text: string) {
-	const speed = vscode.workspace.getConfiguration().get<number>('python-reader.voiceSpeed', 1.0);
+	const speed = getVoiceSpeed();
 	console.log('Voice speed setting:', speed);
 
 	say.speak(text, undefined, speed);
@@ -269,13 +276,13 @@ export function activate(context: vscode.ExtensionContext) {
 			message => {
 				switch (message.command) {
 					case 'setVoiceSpeed':
-						vscode.workspace.getConfiguration().update('python-reader.voiceSpeed', message.value, true);
+						setVoiceSpeed(message.value);
 						break;
 					case 'setFontFamily':
-						vscode.workspace.getConfiguration().update('editor.fontFamily', message.value, true);
+						setSelectedFont(message.value);
 						break;
 					case 'setColorTheme':
-						vscode.workspace.getConfiguration().update('workbench.colorTheme', message.value, true);
+						setVsCodeTheme(message.value);
 						break;
 				}
 			},
@@ -326,16 +333,16 @@ export function getWebviewContent(): string {
 
 			<label for="speed">Voice Speed</label>
 			<select id="speed">
-				<option value="0.6">Slow</option>
-				<option value="1.0" selected>Normal</option>
-				<option value="1.4">Fast</option>
+				<option value="0.6" ${getVoiceSpeed() === 0.6 ? 'selected' : ''}>Slow</option>
+				<option value="1.0" ${getVoiceSpeed() === 1.0 ? 'selected' : ''}>Normal</option>
+				<option value="1.4" ${getVoiceSpeed() === 1.4 ? 'selected' : ''}>Fast</option>
 			</select>
 
 			<label for="font">Font Family</label>
-			<input id="font" type="text" placeholder="e.g., Fira Code, Courier New" />
+			<input id="font" type="text" placeholder="e.g., Fira Code, Courier New" value="${getSelectedFont()}" />
 
 			<label for="theme">VS Code Theme</label>
-			<input id="theme" type="text" placeholder="e.g., Default Dark+, Solarized Light" />
+			<input id="theme" type="text" placeholder="e.g., Default Dark+, Solarized Light" value="${getVsCodeTheme()}" />
 
 			<script>
 				const vscode = acquireVsCodeApi();
