@@ -42,6 +42,10 @@
   {
     "command": "python-reader.openSettingsPanel",
     "title": "Python Reader: Open Settings Panel"
+  },
+  {
+    "command": "extension.readHoverInfo",
+    "title": "Read Hover Information"
   }
   
 ],
@@ -77,6 +81,11 @@
     "command": "python-reader.spellCurrentLine",
     "key": "cmd+alt+s",
     "when": "editorTextFocus && editorLangId == python"
+  },
+  {
+    "command": "extension.readHoverInfo",
+    "key": "ctrl+alt+h",
+    "when": "editorTextFocus"
   }
 ]
 
