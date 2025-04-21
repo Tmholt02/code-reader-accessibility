@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import axios from 'axios';
+import * as dotenv from 'dotenv';
 const say = require('say');
 
 const getVoiceSpeed = () => vscode.workspace.getConfiguration().get<number>('python-reader.voiceSpeed', 1.0);
@@ -8,6 +10,8 @@ const setVoiceSpeed = (speed: number) => vscode.workspace.getConfiguration().upd
 const setSelectedFont = (font: string) => vscode.workspace.getConfiguration().update('editor.fontFamily', font, true);
 const setVsCodeTheme = (theme: string) => vscode.workspace.getConfiguration().update('workbench.colorTheme', theme, true);
 
+dotenv.config({ path: `${__dirname}/../.env` });
+
 export function speakWithSpeed(text: string) {
 	const speed = getVoiceSpeed();
 	console.log('Voice speed setting:', speed);
@@ -16,8 +20,110 @@ export function speakWithSpeed(text: string) {
 
 }
 
+// Change the model name and simplify the prompt
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY ||
+async function getApiKey(context: vscode.ExtensionContext): Promise<string> {
+  // Check VS Code secrets first
+  const secretKey = await context.secrets.get('deepseekApiKey');
+  if (secretKey) return secretKey;
+
+  // Fallback to .env file
+  if (process.env.DEEPSEEK_API_KEY) {
+    await context.secrets.store('deepseekApiKey', process.env.DEEPSEEK_API_KEY);
+    return process.env.DEEPSEEK_API_KEY;
+  }
+
+  // Prompt user if no key found
+  const input = await vscode.window.showInputBox({
+    prompt: 'Enter your DeepSeek API Key',
+    ignoreFocusOut: true
+  });
+  
+  if (input) {
+    await context.secrets.store('deepseekApiKey', input);
+    return input;
+  }
+  
+  throw new Error('No API key provided');
+}
+
+async function analyzeWithDeepSeek(text: string): Promise<string> {
+	if (!DEEPSEEK_API_KEY) {
+	  const message = "API key not configured in .env file";
+	  console.error(message);
+	  speakWithSpeed(message);
+	  return message;
+	}
+  
+	try {
+	  const response = await axios.post(DEEPSEEK_API_URL, {
+		model: "deepseek-chat",
+		messages: [{
+		  role: "user",
+		  content: `You are the screen reader for a blind python developer.
+				Your exact response will be read aloud by a screen reader on vscode to the user on their computer.
+				
+				You will be given a python code snippet to summarize and quickly debug if there are any compilation errors.
+				You may let the user know if the code will not run or if it will succesfully run, highlight any errors and provide a one sentence summary of the code, what is the point of the code?
+				Do not paste any code snippets or any extra text, as that will be read out loud.
+				Get straight to the point and try to keep it brief, potentially a sentence or two. if an error is present, please indicate so, but keep it to a single sentence.
+				Here is the code you are being asked to analyze, it might be as short as a couple lines or an entire python file:
+		  \n\n${text}`
+		}]
+	  }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+      }
+    });
+
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error('API Error:', error);
+    return "Failed to analyze. Check connection and API key.";
+  }
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Python Reader extension is now active!');
+
+	const analyzeWithDeepseekCommand = vscode.commands.registerCommand('python-reader.analyzeWithDeepseek', async () => {
+		const editor = vscode.window.activeTextEditor;
+		
+		if (!editor) {
+			vscode.window.showInformationMessage('No active editor found.');
+			return;
+		}
+	
+		const doc = editor.document;
+		
+		if (doc.languageId !== 'python') {
+			vscode.window.showInformationMessage('This extension only works with Python files.');
+			return;
+		}
+	
+		const text = doc.getText();
+		
+		vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: "Analyzing with DeepSeek...",
+			cancellable: false
+		}, async () => {
+			try {
+				const analysis = await analyzeWithDeepSeek(text);
+				console.log("Analysis result:", analysis);
+				speakWithSpeed(analysis);
+				vscode.window.showInformationMessage('Analysis complete. Results read aloud.');
+			} catch (error) {
+				const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+				console.error("Analysis failed:", error);
+				speakWithSpeed(`Analysis failed: ${errorMsg}`);
+				vscode.window.showErrorMessage(`Analysis failed: ${errorMsg}`);
+			  }
+		});
+	});
 
 	// Read selected text or entire Python file
 	const readPythonCommand = vscode.commands.registerCommand('python-reader.readPython', () => {
@@ -44,9 +150,19 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage('There is no text to read.');
 			return;
 		}
+		
 
 		vscode.window.showInformationMessage('Reading Python code...');
 		speakWithSpeed(textToRead);
+		context.subscriptions.push(
+			readPythonCommand, 
+			readCurrentLineCommand,
+			readSymbolCommand,
+			readNextLineCommand,
+			spellCurrentLineCommand,
+			openSettingsPanelCommand,  // Make sure this exists
+			analyzeWithDeepseekCommand  // Add comma if missing
+		);
 	});
 
 	// Read the current line aloud
@@ -291,7 +407,6 @@ export function activate(context: vscode.ExtensionContext) {
 		);
 	});
 	
-	context.subscriptions.push(openSettingsPanelCommand);
 	
 	
 
@@ -300,7 +415,9 @@ export function activate(context: vscode.ExtensionContext) {
 		readCurrentLineCommand,
 		readSymbolCommand,
 		readNextLineCommand,
-		spellCurrentLineCommand
+		spellCurrentLineCommand,
+		openSettingsPanelCommand,  // Make sure this exists
+		analyzeWithDeepseekCommand  // Add comma if missing
 	);
 }
 
