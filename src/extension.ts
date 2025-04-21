@@ -8,6 +8,12 @@ const setVoiceSpeed = (speed: number) => vscode.workspace.getConfiguration().upd
 const setSelectedFont = (font: string) => vscode.workspace.getConfiguration().update('editor.fontFamily', font, true);
 const setVsCodeTheme = (theme: string) => vscode.workspace.getConfiguration().update('workbench.colorTheme', theme, true);
 
+const voiceSpeeds: number[] = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0];
+let currentSpeedIndex: number = voiceSpeeds.indexOf(getVoiceSpeed());
+if(currentSpeedIndex === -1) {
+	currentSpeedIndex = 1.0;
+}
+
 export function speakWithSpeed(text: string) {
 	const speed = getVoiceSpeed();
 	console.log('Voice speed setting:', speed);
@@ -290,7 +296,27 @@ export function activate(context: vscode.ExtensionContext) {
 			context.subscriptions
 		);
 	});
+
+	const increaseSpeedCommand = vscode.commands.registerCommand('python-reader.increaseVoiceSpeed', () => {
+        if (currentSpeedIndex < voiceSpeeds.length - 1) {
+            currentSpeedIndex++;
+        }
+        const newSpeed = voiceSpeeds[currentSpeedIndex];
+		setVoiceSpeed(newSpeed);
+		speakWithSpeed('Voice speed set to' + newSpeed);
+        vscode.window.showInformationMessage(`Voice speed increased to ${newSpeed}`);
+    });
 	
+	const decreaseSpeedCommand = vscode.commands.registerCommand('python-reader.decreaseVoiceSpeed', () => {
+        if (currentSpeedIndex > 0) {
+            currentSpeedIndex--;
+        }
+        const newSpeed = voiceSpeeds[currentSpeedIndex];
+		setVoiceSpeed(newSpeed);
+		speakWithSpeed('Voice speed set to' + newSpeed);
+        vscode.window.showInformationMessage(`Voice speed decreased to ${newSpeed}`);
+    });
+
 	context.subscriptions.push(openSettingsPanelCommand);
 	
 	
@@ -300,7 +326,9 @@ export function activate(context: vscode.ExtensionContext) {
 		readCurrentLineCommand,
 		readSymbolCommand,
 		readNextLineCommand,
-		spellCurrentLineCommand
+		spellCurrentLineCommand,
+		increaseSpeedCommand,
+		decreaseSpeedCommand
 	);
 }
 
