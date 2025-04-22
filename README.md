@@ -43,6 +43,11 @@ ctrl + alt + a (Windows)
 ctrl + alt + t (Windows)
     to toggle cursor reading mode on/off
 
+6. cmd + option + h (Mac)
+ctrl + alt + h (Windows)
+    to read hover information for the current cursor position
+
+
 
 ## Extension Settings
 

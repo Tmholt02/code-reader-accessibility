@@ -126,6 +126,11 @@
         "command": "python-reader.toggleCursorReading",
         "key": "ctrl+alt+t",
         "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "extension.readHoverInfo",
+        "key": "cmd+alt+h",
+        "when": "editorTextFocus && editorLangId == python"
       }
     ],
     "secrets": [
