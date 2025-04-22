@@ -12,7 +12,7 @@ const setVsCodeTheme = (theme: string) => vscode.workspace.getConfiguration().up
 
 dotenv.config({ path: `${__dirname}/../.env` });
 
-const voiceSpeeds: number[] = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0];
+const voiceSpeeds: number[] = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0];
 let currentSpeedIndex: number = voiceSpeeds.indexOf(getVoiceSpeed());
 if(currentSpeedIndex === -1) {
 	currentSpeedIndex = 1.0;
@@ -420,6 +420,7 @@ export function activate(context: vscode.ExtensionContext) {
         const newSpeed = voiceSpeeds[currentSpeedIndex];
 		setVoiceSpeed(newSpeed);
 		speakWithSpeed('Voice speed set to' + newSpeed);
+		speedStatusBarItem.text = `🔊 Speed: ${voiceSpeeds[currentSpeedIndex]}`;
         vscode.window.showInformationMessage(`Voice speed increased to ${newSpeed}`);
     });
 	
@@ -430,8 +431,14 @@ export function activate(context: vscode.ExtensionContext) {
         const newSpeed = voiceSpeeds[currentSpeedIndex];
 		setVoiceSpeed(newSpeed);
 		speakWithSpeed('Voice speed set to' + newSpeed);
+		speedStatusBarItem.text = `🔊 Speed: ${voiceSpeeds[currentSpeedIndex]}`;
         vscode.window.showInformationMessage(`Voice speed decreased to ${newSpeed}`);
     });	
+
+	const speedStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	speedStatusBarItem.text = `🔊 Speed: ${voiceSpeeds[currentSpeedIndex]}`;
+	speedStatusBarItem.tooltip = 'Python Reader Voice Speed';
+	speedStatusBarItem.show();
 	
 	context.subscriptions.push(
 		readPythonCommand, 
@@ -442,7 +449,8 @@ export function activate(context: vscode.ExtensionContext) {
 		increaseSpeedCommand,
 		decreaseSpeedCommand,
 		openSettingsPanelCommand,  // Make sure this exists
-		analyzeWithDeepseekCommand  // Add comma if missing
+		analyzeWithDeepseekCommand,  // Add comma if missing
+		speedStatusBarItem
 	);
 
 	// Register the command
@@ -537,14 +545,6 @@ export function getWebviewContent(): string {
 		</head>
 		<body>
 			<h2>🛠️ Python Reader Settings</h2>
-
-			<label for="speed">Voice Speed</label>
-			<select id="speed">
-				<option value="0.6" ${getVoiceSpeed() === 0.6 ? 'selected' : ''}>Slow</option>
-				<option value="1.0" ${getVoiceSpeed() === 1.0 ? 'selected' : ''}>Normal</option>
-				<option value="1.4" ${getVoiceSpeed() === 1.4 ? 'selected' : ''}>Fast</option>
-			</select>
-
 			<label for="font">Font Family</label>
 			<input id="font" type="text" placeholder="e.g., Fira Code, Courier New" value="${getSelectedFont()}" />
 
