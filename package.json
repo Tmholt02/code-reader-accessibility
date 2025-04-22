@@ -44,6 +44,14 @@
         "title": "Python Reader: Open Settings Panel"
       },
       {
+        "command": "python-reader.increaseVoiceSpeed",
+        "title": "Python Reader: Increases Voice Speed"
+      },
+      {
+        "command": "python-reader.decreaseVoiceSpeed",
+        "title": "Python Reader: Decreases Voice Speed"
+      },
+      {
         "command": "python-reader.analyzeWithDeepseek",
         "title": "Python Reader: Analyze with DeepSeek"
       },
@@ -76,12 +84,37 @@
     "keybindings": [
       {
         "command": "python-reader.readNextLine",
-        "key": "cmd+alt+down",
+        "key": "ctrl+shift+down",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.readCurrentLine",
+        "key": "ctrl+shift+up",
         "when": "editorTextFocus && editorLangId == python"
       },
       {
         "command": "python-reader.spellCurrentLine",
-        "key": "cmd+alt+s",
+        "key": "ctrl+shift+left",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.readPython",
+        "key": "ctrl+shift+right",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.increaseVoiceSpeed",
+        "key": "ctrl+win+up",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.decreaseVoiceSpeed",
+        "key": "ctrl+win+down",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.openSettingsPanel",
+        "key": "ctrl+win+/",
         "when": "editorTextFocus && editorLangId == python"
       },
       {
@@ -128,7 +161,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "axios": "^1.6.2",
+    "axios": "^1.8.4",
     "say": "^0.16.0"
   }
 }

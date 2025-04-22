@@ -24,28 +24,53 @@ ctrl + shift + P for command mode (Windows)
 - Type "Python Reader: Read File or Selection",
 - Type "Python Reader: Read Current Symbol"
 - Type "Python Reader: Read Next Line"
+- Type "Python Reader: Spell Out Current Line"
 - Type "Python Reader: Open Settings Panel"
 - Type "Python Reader: Analyze with DeepSeek"
+- Type "Python Reader: Increases Voice Speed"
+- Type "Python Reader: Decreases Voice Speed"
 
-2. cmd + option + down-arrowkey (Mac)
-ctrl + alt + down-arrowkey (Windows)
+2. ctrl + shift + down-arrowkey (Mac)
+ctrl + shift + down-arrowkey (Windows)
     to read next line
 
-3. cmd + option + s (Mac)
-ctrl + alt + s (Windows)
+3. ctrl + shift + left-arrowkey (Mac)
+ctrl + shift + left-arrowkey (Windows)
     to read each character and comments on a single line
 
-4. cmd + option + a (Mac)
-ctrl + alt + a (Windows)
+4. ctrl + shift + up-arrowkey (Mac)
+ctrl + shift + up-arrowkey (Windows)
+    to read current line
+
+5. ctrl + shift + right-arrowkey (Mac)
+ctrl + shift + right-arrowkey (Windows)
+    to read the entire file or the selected text (if any)
+
+6. cmd + option + a (Mac)
+win + alt + a (Windows)
     to analyse the entire file with DeepSeek
 
-5. cmd + option + t (Mac)
+7. cmd + option + t (Mac)
 ctrl + alt + t (Windows)
     to toggle cursor reading mode on/off
 
-6. cmd + option + h (Mac)
+8. cmd + option + h (Mac)
 ctrl + alt + h (Windows)
     to read hover information for the current cursor position
+
+9. ctrl + option + up-arrowkey (Mac)
+ctrl + alt + up-arrowkey (Windows)
+    increase voice speed
+
+10. ctrl + option + down-arrowkey (Mac)
+ctrl + alt + down-arrowkey (Windows)
+    decrease voice speed
+
+11. ctrl + option + / (Mac)
+ctrl + alt + / (Windows)
+    open settings menu
+
+
 
 
 
