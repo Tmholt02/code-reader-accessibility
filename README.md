@@ -25,6 +25,7 @@ ctrl + shift + P for command mode (Windows)
 - Type "Python Reader: Read Current Symbol"
 - Type "Python Reader: Read Next Line"
 - Type "Python Reader: Open Settings Panel"
+- Type "Python Reader: Analyze with DeepSeek"
 
 2. cmd + option + down-arrowkey (Mac)
 ctrl + alt + down-arrowkey (Windows)
@@ -33,6 +34,10 @@ ctrl + alt + down-arrowkey (Windows)
 3. cmd + option + s (Mac)
 ctrl + alt + s (Windows)
     to read each character and comments on a single line
+
+4. cmd + option + a (Mac)
+ctrl + alt + a (Windows)
+    to analyse the entire file with DeepSeek
 
 ## Extension Settings
 
