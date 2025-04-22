@@ -46,6 +46,10 @@
       {
         "command": "python-reader.analyzeWithDeepseek",
         "title": "Python Reader: Analyze with DeepSeek"
+      },
+      {
+        "command": "python-reader.toggleCursorReading",
+        "title": "Python Reader: Toggle Cursor Reading"
       }
     ],
     "configuration": {
@@ -83,6 +87,11 @@
       {
         "command": "python-reader.analyzeWithDeepseek",
         "key": "cmd+alt+a",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.toggleCursorReading",
+        "key": "ctrl+alt+t",
         "when": "editorTextFocus && editorLangId == python"
       }
     ],

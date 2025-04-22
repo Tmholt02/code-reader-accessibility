@@ -438,6 +438,52 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+	// Add a variable to track the toggle state
+	let isCursorReadingEnabled = true;
+
+	// Add a command to toggle the cursor reading feature
+	const toggleCursorReadingCommand = vscode.commands.registerCommand('python-reader.toggleCursorReading', () => {
+		isCursorReadingEnabled = !isCursorReadingEnabled;
+		vscode.window.showInformationMessage(`Cursor reading is now ${isCursorReadingEnabled ? 'enabled' : 'disabled'}.`);
+	});
+
+	context.subscriptions.push(toggleCursorReadingCommand);
+
+	// Automatically activate the readOnCursorMove command
+	const editor = vscode.window.activeTextEditor;
+	if (editor && editor.document.languageId === 'python') {
+		let lastWord = '';
+		const onDidChangeTextEditorSelection = vscode.window.onDidChangeTextEditorSelection((event: vscode.TextEditorSelectionChangeEvent) => {
+			const position = event.selections[0].active;
+			const wordRange = editor.document.getWordRangeAtPosition(position);
+			const word = wordRange ? editor.document.getText(wordRange) : '';
+			
+			if (word.trim()) {
+				if (isCursorReadingEnabled) {
+					if (word !== lastWord) {
+						speakWithSpeed(word);
+						lastWord = word;
+					} else {
+						const wordStart = wordRange ? wordRange.start.character : 0;
+						const charPosition = position.character - wordStart - 1;
+
+						if (charPosition >= 0 && charPosition < word.length) {
+							speakWithSpeed(word[charPosition]);
+						} else {
+							const lineText = editor.document.lineAt(position.line).text;
+							const standaloneChar = lineText[position.character];
+							if (standaloneChar && /[.,(){}\[\];:!?<>@#$%^&*+=|~`"'\\/-]/.test(standaloneChar)) {
+								speakWithSpeed(standaloneChar);
+							}
+						}
+					}
+				}
+			}
+		});
+
+		context.subscriptions.push(onDidChangeTextEditorSelection);
+	}
 }
 
 export function getWebviewContent(): string {
