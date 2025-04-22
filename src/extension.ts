@@ -3,7 +3,7 @@ import axios from 'axios';
 import * as dotenv from 'dotenv';
 const say = require('say');
 
-const getVoiceSpeed = () => vscode.workspace.getConfiguration().get<number>('python-reader.voiceSpeed', 1.0);
+const getVoiceSpeed = () => vscode.workspace.getConfiguration().get<number>('python-reader.voiceSpeed', 1.0); // 0.6, 1.0, 1.4
 const getSelectedFont = () => vscode.workspace.getConfiguration().get<string>('editor.fontFamily', 'Fira Code');
 const getVsCodeTheme = () => vscode.workspace.getConfiguration().get<string>('workbench.colorTheme', 'Default Dark+');
 const setVoiceSpeed = (speed: number) => vscode.workspace.getConfiguration().update('python-reader.voiceSpeed', speed, true);
@@ -247,7 +247,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const readNextLineCommand = vscode.commands.registerCommand('python-reader.readNextLine', async () => {
 		const editor = vscode.window.activeTextEditor;
-		if (!editor || editor.document.languageId !== 'python') return;
+		if (!editor || editor.document.languageId !== 'python') {return;}
 	
 		const currentLine = editor.selection.active.line;
 		const totalLines = editor.document.lineCount;
@@ -265,7 +265,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	const spellCurrentLineCommand = vscode.commands.registerCommand('python-reader.spellCurrentLine', () => {
 		const editor = vscode.window.activeTextEditor;
-		if (!editor || editor.document.languageId !== 'python') return;
+		if (!editor || editor.document.languageId !== 'python') {return;}
 	
 		const doc = editor.document;
 		const lineNumber = editor.selection.active.line;
@@ -444,6 +444,71 @@ export function activate(context: vscode.ExtensionContext) {
 		openSettingsPanelCommand,  // Make sure this exists
 		analyzeWithDeepseekCommand  // Add comma if missing
 	);
+
+	// Register the command
+	let disposable = vscode.commands.registerCommand('extension.readHoverInfo', async () => {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			return;
+		}
+
+		const position = editor.selection.active;
+		const hoverInfo = await getHoverInformation(editor, position);
+
+		if (hoverInfo) {
+			speakWithSpeed(hoverInfo);
+		} else {
+			speakWithSpeed('No hover information available.');
+		}
+	});
+
+	context.subscriptions.push(disposable);
+
+	// Add a variable to track the toggle state
+	let isCursorReadingEnabled = true;
+
+	// Add a command to toggle the cursor reading feature
+	const toggleCursorReadingCommand = vscode.commands.registerCommand('python-reader.toggleCursorReading', () => {
+		isCursorReadingEnabled = !isCursorReadingEnabled;
+		vscode.window.showInformationMessage(`Cursor reading is now ${isCursorReadingEnabled ? 'enabled' : 'disabled'}.`);
+	});
+
+	context.subscriptions.push(toggleCursorReadingCommand);
+
+	// Automatically activate the readOnCursorMove command
+	const editor = vscode.window.activeTextEditor;
+	if (editor && editor.document.languageId === 'python') {
+		let lastWord = '';
+		const onDidChangeTextEditorSelection = vscode.window.onDidChangeTextEditorSelection((event: vscode.TextEditorSelectionChangeEvent) => {
+			const position = event.selections[0].active;
+			const wordRange = editor.document.getWordRangeAtPosition(position);
+			const word = wordRange ? editor.document.getText(wordRange) : '';
+			
+			if (word.trim()) {
+				if (isCursorReadingEnabled) {
+					if (word !== lastWord) {
+						speakWithSpeed(word);
+						lastWord = word;
+					} else {
+						const wordStart = wordRange ? wordRange.start.character : 0;
+						const charPosition = position.character - wordStart - 1;
+
+						if (charPosition >= 0 && charPosition < word.length) {
+							speakWithSpeed(word[charPosition]);
+						} else {
+							const lineText = editor.document.lineAt(position.line).text;
+							const standaloneChar = lineText[position.character];
+							if (standaloneChar && /[.,(){}\[\];:!?<>@#$%^&*+=|~`"'\\/-]/.test(standaloneChar)) {
+								speakWithSpeed(standaloneChar);
+							}
+						}
+					}
+				}
+			}
+		});
+
+		context.subscriptions.push(onDidChangeTextEditorSelection);
+	}
 }
 
 export function getWebviewContent(): string {
@@ -509,4 +574,25 @@ export function getWebviewContent(): string {
 
 export function deactivate() {
 	say.stop();
+}
+
+// Function to get hover information
+async function getHoverInformation(editor: vscode.TextEditor, position: vscode.Position): Promise<string | null> {
+	const hover = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', editor.document.uri, position);
+	if (hover && hover.length > 0) {
+		// Extract the text content from the hover objects
+		const hoverText = hover.map(h => {
+			return h.contents.map(content => {
+				if (typeof content === 'string') {
+					return content;
+				} else if ('value' in content) {
+					return content.value;
+				}
+				return '';
+			}).join('\n');
+		}).join('\n');
+		
+		return hoverText;
+	}
+	return null;
 }

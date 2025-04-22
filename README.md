@@ -39,6 +39,11 @@ ctrl + alt + s (Windows)
 ctrl + alt + a (Windows)
     to analyse the entire file with DeepSeek
 
+5. cmd + option + t (Mac)
+ctrl + alt + t (Windows)
+    to toggle cursor reading mode on/off
+
+
 ## Extension Settings
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
