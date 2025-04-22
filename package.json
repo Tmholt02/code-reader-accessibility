@@ -13,106 +13,118 @@
     "onCommand:python-reader.readPython",
     "onCommand:python-reader.readCurrentLine",
     "onCommand:python-reader.readSymbol",
-    "onCommand:python-reader.openSettingsPanel"
-
+    "onCommand:python-reader.openSettingsPanel",
+    "onCommand:python-reader.analyzeWithDeepseek"
   ],
   "main": "./out/extension.js",
   "contributes": {
-   "commands": [
-  {
-    "command": "python-reader.readPython",
-    "title": "Python Reader: Read File or Selection"
-  },
-  {
-    "command": "python-reader.readCurrentLine",
-    "title": "Python Reader: Read Current Line"
-  },
-  {
-    "command": "python-reader.readSymbol",
-    "title": "Python Reader: Read Current Symbol"
-  },
-  {
-    "command": "python-reader.readNextLine",
-    "title": "Python Reader: Read Next Line"
-  },
-  {
-    "command": "python-reader.spellCurrentLine",
-    "title": "Python Reader: Spell Out Current Line"
-  },
-  {
-    "command": "python-reader.openSettingsPanel",
-    "title": "Python Reader: Open Settings Panel"
-  },
-  {
-    "command": "python-reader.increaseVoiceSpeed",
-    "title": "Python Reader: Increases Voice Speed"
-  },
-  {
-    "command": "python-reader.decreaseVoiceSpeed",
-    "title": "Python Reader: Decreases Voice Speed"
-  }
-  
-],
-"configuration": {
-  "type": "object",
-  "title": "Python Reader Settings",
-  "properties": {
-    "python-reader.voiceSpeed": {
-      "type": "number",
-      "default": 1.0,
-      "description": "Controls the speed of the Python screen reader voice."
+    "commands": [
+      {
+        "command": "python-reader.readPython",
+        "title": "Python Reader: Read File or Selection"
+      },
+      {
+        "command": "python-reader.readCurrentLine",
+        "title": "Python Reader: Read Current Line"
+      },
+      {
+        "command": "python-reader.readSymbol",
+        "title": "Python Reader: Read Current Symbol"
+      },
+      {
+        "command": "python-reader.readNextLine",
+        "title": "Python Reader: Read Next Line"
+      },
+      {
+        "command": "python-reader.spellCurrentLine",
+        "title": "Python Reader: Spell Out Current Line"
+      },
+      {
+        "command": "python-reader.openSettingsPanel",
+        "title": "Python Reader: Open Settings Panel"
+      },
+      {
+        "command": "python-reader.increaseVoiceSpeed",
+        "title": "Python Reader: Increases Voice Speed"
+      },
+      {
+        "command": "python-reader.decreaseVoiceSpeed",
+        "title": "Python Reader: Decreases Voice Speed"
+      },
+      {
+        "command": "python-reader.analyzeWithDeepseek",
+        "title": "Python Reader: Analyze with DeepSeek"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Python Reader Settings",
+      "properties": {
+        "python-reader.voiceSpeed": {
+          "type": "number",
+          "default": 1,
+          "description": "Controls the speed of the Python screen reader voice."
+        },
+        "python-reader.fontFamily": {
+          "type": "string",
+          "default": "",
+          "description": "Font family for the editor, e.g., Fira Code, Courier New."
+        },
+        "python-reader.theme": {
+          "type": "string",
+          "default": "",
+          "description": "Color theme to apply in VS Code."
+        }
+      }
     },
-    "python-reader.fontFamily": {
-      "type": "string",
-      "default": "",
-      "description": "Font family for the editor, e.g., Fira Code, Courier New."
-    },
-    "python-reader.theme": {
-      "type": "string",
-      "default": "",
-      "description": "Color theme to apply in VS Code."
-    }
-  }
-}
-,
-"keybindings": [
-  {
-    "command": "python-reader.readNextLine",
-    "key": "ctrl+shift+down",
-    "when": "editorTextFocus && editorLangId == python"
-  },
-  {
-    "command": "python-reader.readCurrentLine",
-    "key": "ctrl+shift+up",
-    "when": "editorTextFocus && editorLangId == python"
-  },
-  {
-    "command": "python-reader.spellCurrentLine",
-    "key": "ctrl+shift+left",
-    "when": "editorTextFocus && editorLangId == python"
-  },
-  {
-    "command": "python-reader.readPython",
-    "key": "ctrl+shift+right",
-    "when": "editorTextFocus && editorLangId == python"
-  },
-  {
-    "command": "python-reader.increaseVoiceSpeed",
-    "key": "ctrl+win+up",
-    "when": "editorTextFocus && editorLangId == python"
-  },
-  {
-    "command": "python-reader.decreaseVoiceSpeed",
-    "key": "ctrl+win+down",
-    "when": "editorTextFocus && editorLangId == python"
-  },
-  {
-    "command": "python-reader.openSettingsPanel",
-    "key": "ctrl+win+/",
-    "when": "editorTextFocus && editorLangId == python"
-  }
-]
-
+    "keybindings": [
+      {
+        "command": "python-reader.readNextLine",
+        "key": "ctrl+shift+down",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.readCurrentLine",
+        "key": "ctrl+shift+up",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.spellCurrentLine",
+        "key": "ctrl+shift+left",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.readPython",
+        "key": "ctrl+shift+right",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.increaseVoiceSpeed",
+        "key": "ctrl+win+up",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.decreaseVoiceSpeed",
+        "key": "ctrl+win+down",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.openSettingsPanel",
+        "key": "ctrl+win+/",
+        "when": "editorTextFocus && editorLangId == python"
+      },
+      {
+        "command": "python-reader.analyzeWithDeepseek",
+        "key": "cmd+alt+a",
+        "when": "editorTextFocus && editorLangId == python"
+      }
+    ],
+    "secrets": [
+      {
+        "id": "deepseekApiKey",
+        "description": "DeepSeek API Key"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -130,10 +142,12 @@
     "@typescript-eslint/parser": "^8.28.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "dotenv": "^16.5.0",
     "eslint": "^9.23.0",
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "axios": "^1.8.4",
     "say": "^0.16.0"
   }
 }
