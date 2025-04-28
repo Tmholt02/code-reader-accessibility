@@ -18,8 +18,15 @@ if(currentSpeedIndex === -1) {
 	currentSpeedIndex = 1.0;
 }
 
-export function speakWithSpeed(text: string) {
-	const speed = getVoiceSpeed();
+export function speakWithSpeed(text: string, override_speed=-1) {
+	let speed;
+	if (override_speed > 0) {
+		speed = override_speed;
+	}
+	else {
+		speed = getVoiceSpeed();
+	}
+
 	console.log('Voice speed setting:', speed);
 
 	say.speak(text, undefined, speed);
@@ -419,7 +426,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         const newSpeed = voiceSpeeds[currentSpeedIndex];
 		setVoiceSpeed(newSpeed);
-		speakWithSpeed('Voice speed set to' + newSpeed);
+		speakWithSpeed('Voice speed set to' + newSpeed, newSpeed);
 		speedStatusBarItem.text = `🔊 Speed: ${voiceSpeeds[currentSpeedIndex]}`;
         vscode.window.showInformationMessage(`Voice speed increased to ${newSpeed}`);
     });
@@ -430,7 +437,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         const newSpeed = voiceSpeeds[currentSpeedIndex];
 		setVoiceSpeed(newSpeed);
-		speakWithSpeed('Voice speed set to' + newSpeed);
+		speakWithSpeed('Voice speed set to' + newSpeed, newSpeed);
 		speedStatusBarItem.text = `🔊 Speed: ${voiceSpeeds[currentSpeedIndex]}`;
         vscode.window.showInformationMessage(`Voice speed decreased to ${newSpeed}`);
     });	
