@@ -461,7 +461,7 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	// Register the command
-	let disposable = vscode.commands.registerCommand('extension.readHoverInfo', async () => {
+	let disposable = vscode.commands.registerCommand('python-reader.readHoverInfo', async () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return;

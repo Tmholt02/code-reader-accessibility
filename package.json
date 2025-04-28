@@ -58,6 +58,10 @@
       {
         "command": "python-reader.toggleCursorReading",
         "title": "Python Reader: Toggle Cursor Reading"
+      },
+      {
+        "command": "python-reader.readHoverInfo",
+        "title": "Python Reader: read hover info"
       }
     ],
     "configuration": {
@@ -128,7 +132,7 @@
         "when": "editorTextFocus && editorLangId == python"
       },
       {
-        "command": "extension.readHoverInfo",
+        "command": "python-reader.readHoverInfo",
         "key": "cmd+alt+h",
         "when": "editorTextFocus && editorLangId == python"
       }

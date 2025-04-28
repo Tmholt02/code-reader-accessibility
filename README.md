@@ -55,7 +55,7 @@ ctrl + alt + t (Windows)
     to toggle cursor reading mode on/off
 
 8. cmd + option + h (Mac)
-ctrl + alt + h (Windows)
+win + alt + h (Windows)
     to read hover information for the current cursor position
 
 9. ctrl + option + up-arrowkey (Mac)
